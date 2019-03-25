@@ -1,0 +1,4 @@
+#include <substrate.h>
+
+%ctor {
+}

@@ -1,0 +1,12 @@
+Package: com.orangebananaspy.organicemojiscrubber
+Name: Organic Emoji Scrubber
+Depends: firmware (>= 11.0), mobilesubstrate, preferenceloader
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Add organic animation to the emoji scrubber
+Maintainer: Orangebananaspy
+Maintainer: Orangebananaspy <admin@orangebananaspy.com>
+Author: Orangebananaspy <support@orangebananaspy.com>
+Section: Tweaks
+Tag: purpose::extension, compatible::ios11, compatible::ios12
+dev: orangebananaspy

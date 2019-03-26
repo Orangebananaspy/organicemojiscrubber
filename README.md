@@ -21,7 +21,7 @@ Sometimes within our tweaks we like to create many objects. Now some from those 
 
 Object *obj;
 @autoreleasepool {
-  // Object is not released as there is a strong pointer outside the scope
+  // object is not released as there is a strong pointer outside the scope
   obj = [[Object alloc] init];
 }
 ```

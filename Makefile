@@ -10,17 +10,19 @@ PACKAGE_VERSION = 1.0
 # development flag
 DEBUG = 1
 
-# production flag
+# production flags
 # FINALPACKAGE = 1
 # DEBUG = 0
 
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = OrganicEmojiScrubber
-OrganicEmojiScrubber_FILES = Tweak.xm
+OrganicEmojiScrubber_FILES = Tweak.xm OESPreferences.m
 OrganicEmojiScrubber_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 after-install::
 	install.exec "killall -9 backboardd"
+SUBPROJECTS += organicemojiscrubber
+include $(THEOS_MAKE_PATH)/aggregate.mk

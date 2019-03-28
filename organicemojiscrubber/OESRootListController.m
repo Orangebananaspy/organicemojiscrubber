@@ -54,6 +54,12 @@ static NSString * const kVelocity = @"_Velocity";
 // for this tweak it doesn't matter but more so for tweaks like NudeKeys
 // where images and big files are loaded
 - (void)respring {
+	// force preferences to update our values
+	Class preferenceClass = NSClassFromString(@"OESPreferences");
+	if (preferenceClass) {
+		[preferenceClass flushPreferences];
+	}
+
 	// it is cleaner than using posix or
 	// calling a function within the tweak
 	NSTask *task = [[NSTask alloc] init];

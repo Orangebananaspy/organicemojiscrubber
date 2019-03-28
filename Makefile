@@ -1,11 +1,12 @@
 ARCHS = armv7 armv7s arm64
 TARGET = iphone:clang
 
-export THEOS_DEVICE_IP = xxx.xxx.xxx.xxx
+# export THEOS_DEVICE_IP = xxx.xxx.xxx.xxx
+export THEOS_DEVICE_IP = 192.168.0.102
 
 THEOS_BUILD_DIR = Packages
 
-PACKAGE_VERSION = 1.0
+PACKAGE_VERSION = 1.1
 
 # development flag
 DEBUG = 1

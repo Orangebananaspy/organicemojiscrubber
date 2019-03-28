@@ -42,7 +42,7 @@ static NSString * const kVelocity = @"_Velocity";
       // make sure to use RTLD_NOW as we want to resolve all symbols from the Library
       // before it ever returns
       void *prefsHandle = dlopen("/usr/lib/CFXPreferences.dylib", RTLD_NOW);
-      if (handle) {
+      if (prefsHandle) {
         Class prefsClass = NSClassFromString(@"CFXPreferences");
         if (prefsClass) {
           preferences = [prefsClass preferenceForIdentifier:(__bridge CFStringRef)preferenceID error:nil];
@@ -78,7 +78,7 @@ static NSString * const kVelocity = @"_Velocity";
   // but calling dlclose does flag the library removable from memory when needed so this ensures
   // we have the library when we need it and it removes it when it wants so we don't hog the resources
   void *prefsHandle = dlopen("/usr/lib/CFXPreferences.dylib", RTLD_NOW);
-  if (handle) {
+  if (prefsHandle) {
     Class prefsClass = NSClassFromString(@"CFXPreferences");
     if (prefsClass) {
       [prefsClass flushPreferencesForIdentifier:(__bridge CFStringRef)preferenceID error:nil];

@@ -1,4 +1,5 @@
 #import "OESPreferences.h"
+#include <dlfcn.h>
 
 #define preferenceFile @"/var/mobile/Library/Preferences/com.orangebananaspy.organicemojiscrubber.plist"
 #define preferenceID @"com.orangebananaspy.organicemojiscrubber"
@@ -8,11 +9,9 @@ static NSString * const kDuration = @"_Duration";
 static NSString * const kDamping = @"_Damping";
 static NSString * const kVelocity = @"_Velocity";
 
-@interface _CFXPreferences : NSObject
-+ (id)copyDefaultPreferences;
-- (CFArrayRef)copyKeyListForIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2 host:(CFStringRef)arg3 container:(CFStringRef)arg4;
-- (CFDictionaryRef)copyValuesForKeys:(CFArrayRef)arg1 identifier:(CFStringRef)arg2 user:(CFStringRef)arg3 host:(CFStringRef)arg4 container:(CFStringRef)arg5;
-- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
+@interface CFXPreferences : NSObject
++ (void)flushPreferencesForIdentifier:(CFStringRef)identifier error:(NSError **)error;
++ (NSDictionary *)preferenceForIdentifier:(CFStringRef)identifier error:(NSError **)error;
 @end
 
 @implementation OESPreferences {
@@ -33,15 +32,6 @@ static NSString * const kVelocity = @"_Velocity";
   return sharedInstance;
 }
 
-// force cfprefsd to write preference to file and update the values of the cache
-+ (void)flushPreferences {
-  Class prefsClass = NSClassFromString(@"_CFXPreferences");
-  if (prefsClass) {
-    _CFXPreferences *prefs = (_CFXPreferences *)[prefsClass copyDefaultPreferences];
-    [prefs flushCachesForAppIdentifier:(__bridge CFStringRef)preferenceID user:kCFPreferencesCurrentUser];
-  }
-}
-
 - (instancetype)init {
   self = [super init];
   if(self) {
@@ -49,21 +39,18 @@ static NSString * const kVelocity = @"_Velocity";
     // for this tweak its not needed but its a good example as it is very useful
     // for big tweaks where preferences can get big
     @autoreleasepool {
-      Class prefsClass = NSClassFromString(@"_CFXPreferences");
-      if (prefsClass) {
-        // get the default preferences
-        _CFXPreferences *prefs = (_CFXPreferences *)[prefsClass copyDefaultPreferences];
-        CFStringRef prefID = (__bridge CFStringRef)preferenceID; // pref ID
-        CFStringRef container = (__bridge CFStringRef)@"/User"; // container for prefs
-
-        // array will be released outside of this autoreleasepool
-        // copy the list of keys in prefs
-        CFArrayRef prefKeys = [prefs copyKeyListForIdentifier:prefID user:kCFPreferencesCurrentUser host:kCFPreferencesCurrentHost container:container];
-
-        // if keys exist and is greater than 0 then copy the key-value pairs as a dictionary
-        if (prefKeys && CFArrayGetCount(prefKeys) > 0) {
-          preferences = (__bridge NSDictionary *)[prefs copyValuesForKeys:prefKeys identifier:prefID user:kCFPreferencesCurrentUser host:kCFPreferencesCurrentHost container:container];
+      // make sure to use RTLD_NOW as we want to resolve all symbols from the Library
+      // before it ever returns
+      void *prefsHandle = dlopen("/usr/lib/CFXPreferences.dylib", RTLD_NOW);
+      if (handle) {
+        Class prefsClass = NSClassFromString(@"CFXPreferences");
+        if (prefsClass) {
+          preferences = [prefsClass preferenceForIdentifier:(__bridge CFStringRef)preferenceID error:nil];
         }
+
+        // important to close as eventually it will want to deallocate the library from memory
+        // also it can only do that when dlclose is called as many times as dlopen
+        dlclose(prefsHandle);
       }
 
       // preferences were not loaded so go the traditional route as a
@@ -82,6 +69,23 @@ static NSString * const kVelocity = @"_Velocity";
     }
   }
   return self;
+}
+
+// force cfprefsd to write preference to file and update the values of the cache
+- (void)flushPreferences {
+  // the only reason we call dlopen is so we can safely call dlclose because dlopen
+  // does not open the library again if it is already opened within the memory of the application
+  // but calling dlclose does flag the library removable from memory when needed so this ensures
+  // we have the library when we need it and it removes it when it wants so we don't hog the resources
+  void *prefsHandle = dlopen("/usr/lib/CFXPreferences.dylib", RTLD_NOW);
+  if (handle) {
+    Class prefsClass = NSClassFromString(@"CFXPreferences");
+    if (prefsClass) {
+      [prefsClass flushPreferencesForIdentifier:(__bridge CFStringRef)preferenceID error:nil];
+    }
+
+    dlclose(prefsHandle);
+  }
 }
 
 - (NSDictionary *)defaults {

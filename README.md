@@ -13,7 +13,7 @@ OrganicEmojiScrubber_CFLAGS = -fobjc-arc
 
 ### Tweak.xm
 Sometimes within our tweaks we like to create many objects. Now some from those many objects will be only every used once for a calculation. After that you have no use for this object so instead of removing this object with all the other long-term objects when your tweak is at the end of its lifetime you can remove it right after you are done with it. This saves you time when deallocating the long-term objects and it even increases memory during the lifetime of the tweak. This technique is crucial in tweak development especially when you hook into SpringBoard or such processes that are active for the entirety of the devices lifetime until a respring or a reboot occurs. You can make use of this early freeing of objects by placing the part of the code within an `@autoreleasepool`.
-```objective-c
+```objectivec
 @autoreleasepool {
   // once the object is out of scope it will be released as there are no strong pointers attached to it
   Object *obj = [[Object alloc] init];

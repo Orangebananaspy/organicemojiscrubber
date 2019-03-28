@@ -57,7 +57,7 @@ static NSString * const kVelocity = @"_Velocity";
 	// force preferences to update our values
 	Class preferenceClass = NSClassFromString(@"OESPreferences");
 	if (preferenceClass) {
-		[preferenceClass flushPreferences];
+		[[preferenceClass sharedInstance] flushPreferences];
 	}
 
 	// it is cleaner than using posix or

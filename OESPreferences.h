@@ -5,7 +5,7 @@
 // which doesn't clutter your tweak
 @interface OESPreferences : NSObject
 + (instancetype)sharedInstance;
-+ (void)flushPreferences;
+- (void)flushPreferences;
 - (NSDictionary *)defaults;
 - (BOOL)isEnabled;
 - (CGFloat)duration;

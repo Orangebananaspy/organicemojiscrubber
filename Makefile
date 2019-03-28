@@ -5,7 +5,7 @@ export THEOS_DEVICE_IP = xxx.xxx.xxx.xxx
 
 THEOS_BUILD_DIR = Packages
 
-PACKAGE_VERSION = 1.1
+PACKAGE_VERSION = 1.2
 
 # development flag
 # DEBUG = 1
